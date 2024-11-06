@@ -28,7 +28,7 @@
             padding-inline: 10px;
         }
         span{
-            padding-inline: 10px;
+            padding-inline: 1px;
         }
         #resultado{
             padding-inline: 20px;
@@ -36,7 +36,6 @@
         }
         img{
             width: 300px;
-            padding-inline: 10px;
         }
         input {
             --c: orange; /* active color */
@@ -103,32 +102,35 @@
     <div class="container">
         <div class="subcontainer">
             <label for="vcc">Vcc:</label>
-            <input type="range" id="vcc" min="0" max="20" step="0.1" value="20" oninput="calcular()">
+            <input type="range" id="vcc" min="0" max="25" step="0.1" value="20" oninput="calcular()">
             <span id="vcc-value">20</span><br>
 
             <label for="rc">R<sub>C</sub>: </label>
-            <input type="range" id="rc" min="10" max="100" step="0.1" value="51.85" oninput="calcular()">
+            <input type="range" id="rc" min="10" max="100" step="0.1" value="51.9" oninput="calcular()">
             <span id="rc-value">51.9</span><br>
 
             <label for="rb">R<sub>B</sub>: </label>
-            <input type="range" id="rb" min="5000" max="10000" step="1" value="10000" oninput="calcular()">
+            <input type="range" id="rb" min="910" max="10000" step="1" value="10000" oninput="calcular()">
             <span id="rb-value">1000</span><br>
 
             <label for="b">β:  </label>
-            <input type="range" id="b" min="100" max="200" step="1" value="100" oninput="calcular()">
+            <input type="range" id="b" min="15" max="200" step="1" value="100" oninput="calcular()">
             <span id="b-value">100</span><br>
 
             <label for="Vin">V<sub>in</sub>:</label>
-            <input type="range" id="Vin" min="1e-3" max="100e-3" step="0.2e-3" value="13.8e-3" oninput="calcular()">
+            <input type="range" id="Vin" min="1e-3" max="100e-3" step="0.1e-3" value="18e-3" oninput="calcular()">
             <span id="vin-value">100</span>
+
+            <select id="miDropdown" onclick="calcular()">
+                <option value="opcion1">mVp</option>
+                <option value="opcion2">mVpp</option>
+                <option value="opcion3">mVrms</option>
+            </select>
         </div>
 
-        <table class="colapsado" id="resultado" border="1">
-            <tr>
-                <th>Parámetro</th>
-                <th>Valor</th>
-            </tr>
-        </table>
+        <div style="padding-inline: 20px;">
+            <table class="colapsado" id="resultado" border="1"></table>
+        </div>
 
         <img src="img/classa.jpg" alt="Amplificador Clase A">
     </div>
@@ -149,8 +151,22 @@
             document.getElementById("rb-value").innerText = `${Rb} Ω`;
             const b = parseFloat(document.getElementById("b").value); // Ganancia de corriente beta
             document.getElementById("b-value").innerText = `${b}`;
-            const Vin = parseFloat(document.getElementById("Vin").value); // Ganancia de corriente beta
-            document.getElementById("vin-value").innerText = `${(Vin*1e3).toFixed(2)} mVp`;
+            var Vin = parseFloat(document.getElementById("Vin").value); // Ganancia de corriente beta
+            document.getElementById("vin-value").innerText = `${(Vin*1e3).toFixed(2)}`;
+            var dropdown = document.getElementById("miDropdown");
+            var opcionSeleccionada = dropdown.options[dropdown.selectedIndex].text;
+
+            if(opcionSeleccionada=="mVp"){
+                console.log("Has seleccionado: " + opcionSeleccionada);
+            }
+            else if(opcionSeleccionada=="mVpp"){
+                console.log("Has seleccionado: " + opcionSeleccionada);
+                Vin=Vin/2;
+            }
+            else if(opcionSeleccionada=="mVrms"){
+                console.log("Has seleccionado: " + opcionSeleccionada);
+                Vin=Math.sqrt(2)*Vin;
+            }
 
             const T = 2 * Math.PI; // 2π constante
 
@@ -195,7 +211,8 @@
                 x: [x_start, x_end],
                 y: [y_start, y_end],
                 mode: 'lines',
-                line: { color: 'rgb(142, 124, 195)', dash: 'dash' },
+                line: { color: 'rgb(142, 124, 195)', dash: 'dash', with:1.5},
+                type: 'scatter',
                 showlegend: false
             };
 
@@ -208,7 +225,8 @@
                 x: [x_start, x_end],
                 y: [y_start, y_end],
                 mode: 'lines',
-                line: { color: 'rgb(142, 124, 195)', dash: 'dash' },
+                line: { color: 'rgb(142, 124, 195)', dash: 'dash', with:1.5},
+                type: 'scatter',
                 showlegend: false
             };
 
@@ -221,7 +239,8 @@
                 x: [x_start, x_end],
                 y: [y_start, y_end],
                 mode: 'lines',
-                line: { color: 'rgb(142, 124, 195)', dash: 'dash' },
+                line: { color: 'rgb(142, 124, 195)', dash: 'dash', with:1.5},
+                type: 'scatter',
                 showlegend: false
             };
 
@@ -402,7 +421,7 @@
                 title: 'Curva Amp Clase A',
                 xaxis: {
                   title: 'VCE [v]',
-                  range: [-(T + 1), Vcc + 5],
+                  range: [-(T + 1), Vcc + 1],
                   showgrid: true,
                   zeroline: true
                 },
