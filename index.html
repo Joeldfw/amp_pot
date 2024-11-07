@@ -102,7 +102,56 @@
             border-color: #888; /* Cambia el color del borde */
         }
         table.colapsado {
+            justify-items: center;
             border-collapse: collapse;
+        }
+        .colapsado tbody tr:nth-child(even) {
+            background-color: #DDD;
+        }
+        td {
+            border: 1px solid #333;
+            padding: 2px;
+            text-align: center; /* Centra el texto horizontalmente */
+            vertical-align: middle; /* Centra el texto verticalmente */
+        }
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+    
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 275px;
+            background-color: #333333d1;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Ajusta la posición encima del texto */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+    
+        /* Flecha del tooltip */
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Coloca la flecha en la parte inferior */
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+    
+        /* Mostrar el tooltip al hacer hover */
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
     </style>
@@ -201,6 +250,7 @@
             const Po = vcerms * icrms;
             const Pin = Vcc * ICQ;
             const n = Po/Pin * 100;
+            const Pq = Pin-Po;
 
             // Puntos en la línea roja (por ejemplo)
             let x1 = 0, y1 = Ic_sat;  // Punto inicial
@@ -259,12 +309,18 @@
             // Mostrar resultados
             const resultado = document.getElementById("resultado");
             resultado.innerHTML = `
-                <tr><td>Ic<sub>sat</sub></td><td>${(Ic_sat * 1e3).toFixed(3)} mA</td><td>I<sub>C</sub></td><td>${(ICQ * 1e3).toFixed(3)} mA</td></tr>
-                <tr><td>I<sub>B</sub></td><td>${(Ib * 1e3).toFixed(3)} mA</td><td>V<sub>CE</sub></td><td>${VCEQ.toFixed(3)} V</td></tr>
-                <tr><td>Vout</td><td>${Vout.toFixed(3)} Vp</td><td>Pto.Q</td><td>(${VCEQ.toFixed(2)}, ${(ICQ * 1e3).toFixed(2)} mA)</td></tr>
-                <tr><td>Iout</td><td>${(icout*1e3).toFixed(3)} mAp</td><td>Av</td><td>${Av.toFixed(3)}</td></tr>
-                <tr><td>Pout</td><td>${(Po*1e3).toFixed(3)} mW</td><td>Pin</td><td>${Pin.toFixed(3)} W</td></tr>
-                <tr><td>η</td><td>${n.toFixed(3)} %</td><td>I<sub>E</sub></td><td>${(IE*1e3).toFixed(3)} mA</td></tr>
+                <tr><td class="tooltip">Ic<sub>sat</sub> <span class="tooltip-text">Corriente de colector de saturacion</span> </td><td>${(Ic_sat * 1e3).toFixed(3)} mA</td>
+                <td class="tooltip">I<sub>C</sub> <span class="tooltip-text">Corriente de colector</span> </td><td>${(ICQ * 1e3).toFixed(3)} mA</td></tr>
+                <tr><td class="tooltip">I<sub>B</sub><span class="tooltip-text">Corriente de Base</span></td><td>${(Ib * 1e3).toFixed(3)} mA</td>
+                <td class="tooltip">V<sub>CE</sub><span class="tooltip-text">Voltaje Colector-Emisor</span></td><td>${VCEQ.toFixed(3)} V</td></tr>
+                <tr><td class="tooltip">Vout<span class="tooltip-text">Voltaje de salida</span></td><td>${Vout.toFixed(3)} Vp</td>
+                <td class="tooltip">Pto.Q<span class="tooltip-text">Punto quieto de trabajo</span></td><td>(${VCEQ.toFixed(2)}, ${(ICQ * 1e3).toFixed(2)} mA)</td></tr>
+                <tr><td class="tooltip">Iout<span class="tooltip-text">Corriente de salida</span></td><td>${(icout*1e3).toFixed(3)} mAp</td>
+                <td class="tooltip">Av<span class="tooltip-text">Ganancia de voltaje</span></td><td>${Av.toFixed(3)}</td></tr>
+                <tr><td class="tooltip">Pout<span class="tooltip-text">Potencia de salida</span></td><td>${(Po*1e3).toFixed(3)} mW</td>
+                <td class="tooltip">Pin<span class="tooltip-text">Potencia de entrada</span></td><td>${Pin.toFixed(3)} W</td></tr>
+                <tr><td class="tooltip">η<span class="tooltip-text">Eficiencia: Indica la cantidad de potencia que se transfiere a la carga</span></td><td>${n.toFixed(3)} %</td>
+                <td class="tooltip">P<sub>Q</sub><span class="tooltip-text">Potencia disipada por el transistor</span></td><td>${(Pq).toFixed(2)} W</td></tr>
             `;
 
             // Generar los datos de la gráfica
